@@ -31,9 +31,14 @@ import octis
 from octis.evaluation_metrics.coherence_metrics import Coherence
 from octis.evaluation_metrics.diversity_metrics import TopicDiversity
 
-import Initialization as init
-import TNTM_inference
 
+
+try:
+  import Initialization as init
+  import TNTM_inference
+except:
+  import Code.TNTM.Initialization as init
+  import Code.TNTM.TNTM_inference as TNTM_inference
 
 class TNTM_bow():
   def __init__(
@@ -54,7 +59,10 @@ class TNTM_bow():
     device = None, 
     validation_set_size : float = 0.2, 
     early_stopping: bool = True,
-    n_epochs_early_stopping: int = 10
+    n_epochs_early_stopping: int = 10,
+    return_embeddings = False,
+    umap_hyperparams = {'n_neighbors': 15, 'min_dist': 0.01},
+    eps: float = 1e-4
   ):
 
     """
@@ -76,6 +84,10 @@ class TNTM_bow():
     :param float validation set size: validation_set_size: Fraction of the used dataset for validation
     :param bool early_stopping : Whether early stopping based on the median validation loss should be done
     :param int n_epochs_early_stopping: Patience paramter for early stopping, i.e. for how many epochs to wait until the next decrease in median validation loss has to happen
+    :param bool return_embeddings: Whether to return the embeddings of the topics. If true, the embeddings of the topics are returned.
+    :param dict umap_hyperparams: hyperparameters for the UMAP algorithm.
+    :param float eps: small number to avoid numerical instabilities
+
     """
 
     self.n_topics = n_topics
@@ -92,6 +104,9 @@ class TNTM_bow():
     self.validation_set_size = validation_set_size
     self.early_stopping = early_stopping
     self.n_epochs_early_stopping = n_epochs_early_stopping
+    self.return_embeddings = return_embeddings
+    self.umap_hyperparams = umap_hyperparams
+    self.eps = eps
 
     if device == None:
       self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -140,7 +155,7 @@ class TNTM_bow():
 
     # compute the low-dimensional embeddings and the initial topic assignments to use later
     init_in = init.Initializer(self.embedding_ten.cpu().detach().numpy(), n_topics = self.n_topics, n_dims = self.n_dims)
-    embeddings_proj, mus_init, L_lower_init, log_diag_init, bic = init_in.reduce_dim_and_cluster()
+    embeddings_proj, mus_init, L_lower_init, log_diag_init, bic = init_in.reduce_dim_and_cluster(umap_hyperparams = self.umap_hyperparams, eps = self.eps)
 
     embeddings_proj_ten = torch.tensor(embeddings_proj).to(self.device)
     mus_init_ten = torch.tensor(mus_init).to(self.device)
@@ -214,6 +229,9 @@ class TNTM_bow():
                   )
     self.topwords = topwords
     self.probs = probs
+
+    if self.return_embeddings:
+      return self.topwords, self.probs, embeddings_proj_ten
     return self.topwords, self.probs
 
 
