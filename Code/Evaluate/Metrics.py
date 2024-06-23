@@ -408,14 +408,13 @@ class Perplexity(AbstractMetric):
     def __init__(self, base: float = np.exp(1)):
         self.base = base
 
-    def score(self, nll_lis:list[float]):
+    def score(self, nll_mean: float) -> float:
         """
         Compute perplexity from a list of negative log likelihoods
         Args:
         nll_lis: list of negative log likelihoods
         """
-        nll = np.mean(nll_lis)
-        return np.power(self.base, nll)
+        return np.power(self.base, nll_mean)
 
 
 def get_tw_embeddings(dataset):
@@ -435,7 +434,7 @@ def get_tw_embeddings(dataset):
     return tw_emb
 
 
-def score_all(dataset, tw_emb, n_words, result):
+def score_all(dataset, tw_emb, n_words, result, validation_loss_mean = None):
     """
     Compute all metrics for a dataset
     Params:
@@ -443,6 +442,7 @@ def score_all(dataset, tw_emb, n_words, result):
     tw_emb: dict with embeddings for all words in the dataset
     n_words: number of top words to consider
     result: dict with model output
+    validation_loss_mean: list of validation losses to compute perplexity
     """
 
     metrics = [
@@ -460,6 +460,9 @@ def score_all(dataset, tw_emb, n_words, result):
     score_dic = {}
     for name, metric in tqdm(metrics_dic.items()):
         score_dic[name] = metric.score(result)
+
+    if validation_loss_mean is not None:
+        score_dic['Perplexity'] = Perplexity().score(validation_loss_mean)
 
     return score_dic
 
