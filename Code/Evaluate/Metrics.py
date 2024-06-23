@@ -410,11 +410,11 @@ class Perplexity(AbstractMetric):
 
     def score(self, nll_mean: float) -> float:
         """
-        Compute perplexity from a list of negative log likelihoods
+        Compute perplexity from the mean negative log likelihood
         Args:
         nll_lis: list of negative log likelihoods
         """
-        return np.power(self.base, nll_mean)
+        return nll_mean
 
 
 def get_tw_embeddings(dataset):
