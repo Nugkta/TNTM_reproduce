@@ -62,7 +62,9 @@ class TNTM_bow():
     n_epochs_early_stopping: int = 10,
     return_embeddings = False,
     umap_hyperparams = {'n_neighbors': 15, 'min_dist': 0.01},
-    eps: float = 1e-4
+    eps: float = 1e-4,
+    sparse_ten = False,
+    return_losses = False
   ):
 
     """
@@ -87,7 +89,8 @@ class TNTM_bow():
     :param bool return_embeddings: Whether to return the embeddings of the topics. If true, the embeddings of the topics are returned.
     :param dict umap_hyperparams: hyperparameters for the UMAP algorithm.
     :param float eps: small number to avoid numerical instabilities
-
+    :param bool sparse_ten: Whether the bag-of-words tensor should be converted to a sparse tensor. This can be useful for large datasets.
+    :param bool return_losses: Whether to return the losses of the training. If true, the losses are returned.
     """
 
     self.n_topics = n_topics
@@ -107,6 +110,8 @@ class TNTM_bow():
     self.return_embeddings = return_embeddings
     self.umap_hyperparams = umap_hyperparams
     self.eps = eps
+    self.sparse_ten = sparse_ten
+    self.return_losses = return_losses
 
     if device == None:
       self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -151,7 +156,11 @@ class TNTM_bow():
       for word in doc:
         bow_ten[i, word] +=1
 
-    self.bow_ten = bow_ten.to_sparse()
+    if self.sparse_ten:
+      self.bow_ten = bow_ten.to_sparse()
+
+    else:
+      self.bow_ten = bow_ten
 
     # compute the low-dimensional embeddings and the initial topic assignments to use later
     init_in = init.Initializer(self.embedding_ten.cpu().detach().numpy(), n_topics = self.n_topics, n_dims = self.n_dims)
@@ -196,7 +205,7 @@ class TNTM_bow():
 
     # training 
 
-    TNTM_inference.train_loop(
+    loss_lis_all, val_loss_lis_all = TNTM_inference.train_loop(
                 model      = self.model,
                 optimizer1 = opt1, 
                 optimizer2 = opt2, 
@@ -209,7 +218,7 @@ class TNTM_bow():
                 n_epochs   = self.n_epochs, 
                 save_path  = self.save_path, 
                 config     = self.train_config, 
-                sparse_ten = True)
+                sparse_ten = self.sparse_ten)
 
     # get topic paramters 
 
@@ -230,9 +239,17 @@ class TNTM_bow():
     self.topwords = topwords
     self.probs = probs
 
+
+    if self.return_losses:
+      return self.topwords, self.probs, loss_lis_all, val_loss_lis_all
+
     if self.return_embeddings:
-      return self.topwords, self.probs, embeddings_proj_ten
-    return self.topwords, self.probs
+      return self.topwords, self.probs, embeddings_proj_ten, 
+    else:
+      return self.topwords, self.probs
+    
+    
+    
 
 
 

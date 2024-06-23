@@ -31,8 +31,12 @@ import octis
 from octis.evaluation_metrics.coherence_metrics import Coherence
 from octis.evaluation_metrics.diversity_metrics import TopicDiversity
 
-import Initialization as init
-import TNTM_inference
+try:
+  import Initialization as init
+  import TNTM_inference
+except:
+  import Code.TNTM.Initialization as init
+  import Code.TNTM.TNTM_inference as TNTM_inference
 
 
 class TNTM_SentenceTransformer():

@@ -401,6 +401,23 @@ class Embedding_Topic_Diversity(AbstractMetric):
 
         return sim_mean
 
+class Perplexity(AbstractMetric):
+    """
+    Implement perplxity metric
+    """
+    def __init__(self, base: float = np.exp(1)):
+        self.base = base
+
+    def score(self, nll_lis:list[float]):
+        """
+        Compute perplexity from a list of negative log likelihoods
+        Args:
+        nll_lis: list of negative log likelihoods
+        """
+        nll = np.mean(nll_lis)
+        return np.power(self.base, nll)
+
+
 def get_tw_embeddings(dataset):
     """
     Get embeddings for a dataset
@@ -441,7 +458,7 @@ def score_all(dataset, tw_emb, n_words, result):
     metrics_dic = {name:metric for name, metric in zip(metrics_names, metrics)}
 
     score_dic = {}
-    for name, metric in metrics_dic.items():
+    for name, metric in tqdm(metrics_dic.items()):
         score_dic[name] = metric.score(result)
 
     return score_dic
