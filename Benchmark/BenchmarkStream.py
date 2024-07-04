@@ -80,11 +80,11 @@ class Benchmark:
         res = mod.train_model(self.ocits_dataset)
 
         res
-
+        
         evaluation_result = score_all(
             dataset = self.octis_dataset,
             tw_emb=self.tw_emb,
-            n_words=n_topics,
+            n_words=10,
             result = {'topics': res["topics"], 
                     "topic-word-matrix": res["topic-word-matrix"]},
         )
