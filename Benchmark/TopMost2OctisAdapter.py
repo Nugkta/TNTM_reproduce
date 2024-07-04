@@ -47,8 +47,8 @@ class TopMost2OctisAdapter:
             doc_embed_model: the document embedding model to use
         """
 
-        corpus = dataset._Dataset_corpus 
-        vocab = dataset._Dataset_vocab
+        corpus = dataset._corpus 
+        vocab = dataset._vocabulary
 
         # only keep words in the vocabulary
         vocab_set = set(vocab)
@@ -73,7 +73,7 @@ class TopMost2OctisAdapter:
         model = self.model_topmost(
             **total_kwargs
         
-        )
+        ).to(self.device)
         trainer = topmost.trainers.BasicTrainer(
             model = model,
             dataset=dataset,

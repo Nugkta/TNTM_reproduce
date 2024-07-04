@@ -75,7 +75,9 @@ class Benchmark:
         benchmark a model
         """
 
-        res = model.train_model(self.ocits_dataset)
+        mod = model(n_topics)
+
+        res = mod.train_model(self.ocits_dataset)
 
         res
 
@@ -103,7 +105,6 @@ class Benchmark:
             for n_topics in self.n_topics:
                 results.append(self.benchmark_model(
                     model = model,
-                    data2params_fun = data2params_fun,
                     n_topics = n_topics
                 ))
 
