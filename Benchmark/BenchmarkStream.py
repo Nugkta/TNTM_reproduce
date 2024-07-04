@@ -7,8 +7,7 @@ import sys
 
 sys.path.append("../")
 
-from TNTM.Benchmark.TopMost2OctisAdapter import TopMost2OctisAdapter
-
+    
 class Benchmark:
 
     def __init__(
