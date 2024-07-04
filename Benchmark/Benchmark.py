@@ -87,12 +87,15 @@ class Benchmark:
 
         res = model.fit(self.ocits_dataset)
 
+        topics = res[0]
+        topics_split = [topic.split() for topic in topics]
+
 
         evaluation_result = score_all(
             dataset = self.octis_dataset,
             tw_emb=self.tw_emb,
             n_words=n_topics,
-            result = {'topics': res[0], 
+            result = {'topics': topics_split, 
                     "topic-word-matrix": res[1]},
         )
 
