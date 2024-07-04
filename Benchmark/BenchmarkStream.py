@@ -7,7 +7,7 @@ import sys
 
 sys.path.append("../")
 
-    
+
 class Benchmark:
 
     def __init__(
@@ -69,30 +69,22 @@ class Benchmark:
 
     def benchmark_model(self, 
                         model, 
-                        data2params_fun, 
+                        #data2params_fun, 
                         n_topics):
         """
         benchmark a model
         """
 
-        model = TopMost2OctisAdapter(
-            model_topmost = model,
-            model_kwargs= {
-                "num_topics": n_topics,
-            },
-            data2_additional_kwargs = data2params_fun,
-            batch_size = self.batch_size
-        )
+        res = model.train_model(self.ocits_dataset)
 
-        res = model.fit(self.ocits_dataset)
-
+        res
 
         evaluation_result = score_all(
             dataset = self.octis_dataset,
             tw_emb=self.tw_emb,
             n_words=n_topics,
-            result = {'topics': res[0], 
-                    "topic-word-matrix": res[1]},
+            result = {'topics': res["topics"], 
+                    "topic-word-matrix": res["topic-word-matrix"]},
         )
 
         return evaluation_result
