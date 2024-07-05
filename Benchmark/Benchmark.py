@@ -110,16 +110,25 @@ class Benchmark:
 
         self.setup()
 
-        results = []
+        results = {}
 
         assert len(self.models) == len(self.model_specific_data2params_fun_list), "The number of models and the number of data2params functions must be the same"
         for model, data2params_fun in tqdm(list(zip(self.models, self.model_specific_data2params_fun_list))):
             for n_topics in self.n_topics:
-                results.append(self.benchmark_model(
-                    model = model,
-                    data2params_fun = data2params_fun,
-                    n_topics = n_topics
-                ))
+                try:
+                    r = self.benchmark_model(
+                        model = model,
+                        data2params_fun = data2params_fun,
+                        n_topics = n_topics
+                    )
+                except Exception as e:
+                    # dont't do anything with a keyboard interrupt
+                    if isinstance(e, KeyboardInterrupt):
+                        raise e
+                    else:
+                        r[(model, n_topics)] = None
+
+                results[(model, n_topics)] = r
 
                 print(f"Done with model {model} and n_topics {n_topics}")
 
