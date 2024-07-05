@@ -1,5 +1,6 @@
 import pickle
 from Code.Evaluate.Metrics import score_all, get_tw_embeddings
+from Benchmark.OctisDataset2StreamDataset import OctisDataset2StreamDataset
 import torch
 from tqdm import tqdm
 
@@ -28,6 +29,7 @@ class Benchmark:
             n_topics: a list of numbers of topics to use
             batch_size: the batch size to use for the model	
         """
+        octis_dataset = OctisDataset2StreamDataset(octis_dataset)
 
         self.octis_dataset = octis_dataset
         self.embedding_df = embedding_df
@@ -38,6 +40,8 @@ class Benchmark:
 
 
     def setup(self):
+
+        
 
         octis_dataset = self.octis_dataset
         embedding_df = self.embedding_df
