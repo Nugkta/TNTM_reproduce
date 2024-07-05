@@ -1,5 +1,8 @@
 import pickle
-from Code.Evaluate.Metrics import score_all, get_tw_embeddings
+try:
+    from Code.Evaluate.Metrics import score_all, get_tw_embeddings
+except:
+    from TNTM.Code.Evaluate.Metrics import score_all, get_tw_embeddings
 import torch
 from tqdm import tqdm
 
@@ -88,14 +91,13 @@ class Benchmark:
         res = model.fit(self.ocits_dataset)
 
         topics = res[0]
-        topics_split = [topic.split() for topic in topics]
 
 
         evaluation_result = score_all(
             dataset = self.octis_dataset,
             tw_emb=self.tw_emb,
             n_words=10,
-            result = {'topics': topics_split, 
+            result = {'topics': topics, 
                     "topic-word-matrix": res[1]},
         )
 

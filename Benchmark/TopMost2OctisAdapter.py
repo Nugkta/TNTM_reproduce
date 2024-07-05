@@ -84,9 +84,11 @@ class TopMost2OctisAdapter:
 
         # split topwords
 
-        top_words = [[word for word in top] for top in top_words]
+        top_words = [[word for word in top.split()] for top in top_words]
         top_words = np.array(top_words)
 
-        return top_words, train_theta
+        beta = trainer.get_beta()
+
+        return top_words, beta
 
             
