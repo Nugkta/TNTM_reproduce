@@ -2,6 +2,7 @@ import octis.dataset
 import topmost 
 import octis
 import torch
+import numpy as np
 
 class TopMost2OctisAdapter:
     """
@@ -80,6 +81,11 @@ class TopMost2OctisAdapter:
         )
 
         top_words, train_theta = trainer.train()
+
+        # split topwords
+
+        top_words = [[word for word in top] for top in top_words]
+        top_words = np.array(top_words)
 
         return top_words, train_theta
 
