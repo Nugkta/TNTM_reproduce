@@ -117,7 +117,7 @@ class Benchmark:
                     if isinstance(e, KeyboardInterrupt):
                         raise e
                     else:
-                        r = None
+                        r = e
 
                 results[(model, n_topics)] = r
 
