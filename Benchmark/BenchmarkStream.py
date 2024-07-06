@@ -19,6 +19,8 @@ class Benchmark:
             model_specific_data2params_fun_list: list,
             n_topics:list = [20, 200],
             batch_size: int = 256,
+            embeddings_path = "../",
+            embeddings_file_path = "../"
     ):
         """"
         Args:
@@ -28,6 +30,8 @@ class Benchmark:
             model_specific_data2params_fun_list: a list of functions that take the input data and return a dictionary of additional arguments
             n_topics: a list of numbers of topics to use
             batch_size: the batch size to use for the model	
+            embeddings_path: the path to the embeddings
+            embeddings_file_path: the path to the embeddings file
         """
         octis_dataset = OctisDataset2StreamDataset(octis_dataset)
 
@@ -37,6 +41,9 @@ class Benchmark:
         self.model_specific_data2params_fun_list = model_specific_data2params_fun_list
         self.n_topics = n_topics
         self.batch_size = batch_size
+
+        self.embeddings_path = embeddings_path
+        self.embeddings_file_path = embeddings_file_path
 
 
     def setup(self):
@@ -71,6 +78,10 @@ class Benchmark:
         self.embedded_words = embedded_words
         self.corpus = corpus
 
+        self.ocits_dataset.name = "dataset"
+        
+        self.ocits_dataset.get_labels = lambda: [1 for _ in range(len(self.ocits_dataset.get_corpus()))]
+
     def benchmark_model(self, 
                         model, 
                         #data2params_fun, 
@@ -80,6 +91,9 @@ class Benchmark:
         """
 
         mod = model(n_topics)
+
+        mod.embeddings_path =  self.embeddings_path
+        mod.embeddings_file_path = self.embeddings_file_path
 
         res = mod.train_model(self.ocits_dataset)
 
