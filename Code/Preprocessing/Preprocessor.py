@@ -441,7 +441,8 @@ class Preprocessor:
 
             chunk = [101] + chunk + [102]  # add start-of-sequence and end-of-sequence tokens
 
-            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+            # Get the device that bert is on rather than hardcoding
+            device = next(bert.parameters()).device
 
             ten_chunk = torch.tensor(chunk).unsqueeze(0).to(device)
             emb = bert(ten_chunk)['last_hidden_state']
