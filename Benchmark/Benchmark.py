@@ -5,12 +5,14 @@ except:
     from TNTM.Code.Evaluate.Metrics import score_all, get_tw_embeddings
 import torch
 from tqdm import tqdm
+import random
+import numpy as np
 
 import sys 
 
 sys.path.append("../")
 
-from TNTM.Benchmark.TopMost2OctisAdapter import TopMost2OctisAdapter
+from Benchmark.TopMost2OctisAdapter import TopMost2OctisAdapter
 
 class Benchmark:
 
@@ -22,6 +24,7 @@ class Benchmark:
             model_specific_data2params_fun_list: list,
             n_topics:list = [20, 200],
             batch_size: int = 256,
+            seed: int = None,
     ):
         """"
         Args:
@@ -30,7 +33,8 @@ class Benchmark:
             models: a list of models to benchmark
             model_specific_data2params_fun_list: a list of functions that take the input data and return a dictionary of additional arguments
             n_topics: a list of numbers of topics to use
-            batch_size: the batch size to use for the model	
+            batch_size: the batch size to use for the model
+            seed: random seed for reproducibility
         """
 
         self.octis_dataset = octis_dataset
@@ -39,7 +43,17 @@ class Benchmark:
         self.model_specific_data2params_fun_list = model_specific_data2params_fun_list
         self.n_topics = n_topics
         self.batch_size = batch_size
-
+        self.seed = seed
+        
+        # Set random seeds if provided
+        if seed is not None:
+            random.seed(seed)
+            np.random.seed(seed)
+            torch.manual_seed(seed)
+            if torch.cuda.is_available():
+                torch.cuda.manual_seed_all(seed)
+                torch.backends.cudnn.deterministic = True
+                torch.backends.cudnn.benchmark = False
 
     def setup(self):
 

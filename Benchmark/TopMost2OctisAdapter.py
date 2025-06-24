@@ -9,7 +9,7 @@ class TopMost2OctisAdapter:
     A class that allows to use the TopMost implementation similar to an Octis model
     """
 
-    NoPreprocessing = topmost.preprocessing.Preprocessing(
+    NoPreprocessing = topmost.preprocess.Preprocess(
         keep_num = True,
         keep_alphanum= True,
         min_length= 0,
@@ -58,18 +58,23 @@ class TopMost2OctisAdapter:
         # join the words back into documents
         corpus = [" ".join(doc) for doc in corpus]
 
-
         dataset = topmost.data.RawDataset(docs = corpus, 
-                                                   preprocessing = self.NoPreprocessing,
+                                                   preprocess = self.NoPreprocessing,
                                                    device=self.device,
                                                    batch_size = self.batch_size,
                                                    doc_embed_model = doc_embed_model)
         print(dataset.vocab_size)
 
+        # Use the processed dataset's vocabulary size for the model
         data_kwargs = self.data2_additional_kwargs(
             corpus = corpus,
             vocab = vocab
         )
+        
+        # Update vocab_size to match the processed dataset
+        if 'vocab_size' in data_kwargs:
+            data_kwargs['vocab_size'] = dataset.vocab_size
+        
         total_kwargs = {**self.model_kwargs, **data_kwargs}
         model = self.model_topmost(
             **total_kwargs

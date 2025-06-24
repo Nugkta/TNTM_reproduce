@@ -1,0 +1,28 @@
+# TNTM Embedding and Training Method Comparison
+
+## Summary of Findings
+
+1. **Full Training vs. GMM Initialization**:
+   - Full TNTM training generally outperforms GMM initialization alone in terms of topic coherence (NPMI, WE_CO_PW, Embedding_Coherence)
+   - The performance gap varies depending on the embedding type
+   - GMM initialization provides a strong baseline and might be sufficient for some applications where runtime is critical
+
+2. **Embedding Type Comparison**:
+   - BERT embeddings typically yield the best topic coherence metrics
+   - Word2Vec embeddings perform competitively and might be preferred for efficiency
+   - Random embeddings perform significantly worse, highlighting the importance of semantic information in embeddings
+
+3. **Runtime Considerations**:
+   - GMM initialization is significantly faster than full TNTM training
+   - The choice of embedding type has minimal impact on runtime
+
+4. **Topic Similarity**:
+   - Topics discovered using the same embedding type tend to be more similar regardless of training method
+   - BERT and Word2Vec embeddings produce more similar topics compared to random embeddings
+   - Full TNTM training and GMM initialization with the same embeddings produce moderately similar topics
+
+5. **Practical Recommendations**:
+   - For best topic quality: TNTM+BERT
+   - For good quality with faster training: GMM+BERT
+   - For balanced performance and efficiency: TNTM+Word2Vec or GMM+Word2Vec
+   - Random embeddings should be avoided when quality is important
